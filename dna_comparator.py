@@ -1,32 +1,47 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
+import re
+from Bio.Align import PairwiseAligner
 
 def load_and_check_fasta(reference_file, sample_file):
     print("--- Running DNA Analyzer ---")
     
     try:
-        # Read files containing a single biological sequence each
+        # Read files
         ref_record = SeqIO.read(reference_file, "fasta")
         sample_record = SeqIO.read(sample_file, "fasta")
+
+        # Extract and cleaning sequences
+        raw_ref = str(ref_record.seq).upper()
+        raw_sample = str(sample_record.seq).upper()
+        ref_seq = re.sub(r'[^ATCGN]', '', raw_ref)
+        sample_seq = re.sub(r'[^ATCGN]', '', raw_sample)
         
-        # Extract sequences and convert to uppercase for reliability
-        ref_seq = ref_record.seq.upper()
-        sample_seq = sample_record.seq.upper()
-        
-        print(f"Reference loaded. Length: {len(ref_seq)} bp (base pairs)")
-        print(f"Sample loaded. Length: {len(sample_seq)} bp")
-        
-        # Sequence length validation
-        if len(ref_seq) != len(sample_seq):
-            print("Warning: Sequences have different lengths! Direct comparison is impossible.")
-            return None, None
-        else:
-            print("Lengths match, proceeding with the analysis.\n")
-            return ref_seq, sample_seq
+        print(f"Reference cleared. Length: {len(ref_seq)} bp")
+        print(f"Sample cleared. Length: {len(sample_seq)} bp")
+        return ref_seq, sample_seq
             
     except Exception as error:
         print(f"Error reading FASTA files: {error}")
         return None, None
+
+def align_sequences(ref_dna, sample_dna):
+    aligner = PairwiseAligner()
+    aligner.mode = 'local'  # Ignores different line beginnings and endings
+    
+    # Configure gap penalties
+    aligner.open_gap_score = -10
+    aligner.extend_gap_score = -0.5
+    
+    # Perform alignment
+    alignments = aligner.align(ref_dna, sample_dna)
+    best_alignment = alignments[0]
+    
+    # Extract aligned sequences
+    aligned_ref = best_alignment[0]
+    aligned_sample = best_alignment[1]
+    
+    return aligned_ref, aligned_sample
 
 def analyze_dna_sequences(ref_dna, sample_dna):
     if ref_dna is None or sample_dna is None:
@@ -45,9 +60,14 @@ def find_and_display_mutations(ref_dna, sample_dna):
     
     for index, (nuc_ref, nuc_sample) in enumerate(zip(ref_dna, sample_dna)):
         if nuc_ref != nuc_sample:
-            mutations_count += 1
-            show_mutation_context(ref_dna, sample_dna, mutation_pos=index)
-            check_codon_mutation(ref_dna, sample_dna, mutation_pos=index)
+            if nuc_ref == '-':
+                print(f"Position {index + 1}: Insertion of {nuc_sample} in Sample")
+            elif nuc_sample == '-':
+                print(f"Position {index + 1}: Deletion of {nuc_ref} in Sample")
+            else:
+                mutations_count += 1
+                show_mutation_context(ref_dna, sample_dna, mutation_pos=index)
+                check_codon_mutation(ref_dna, sample_dna, mutation_pos=index)
             
     print("\n" + "="*40)
     print(f"Total point mutations found: {mutations_count}")
@@ -115,4 +135,5 @@ def check_codon_mutation(ref_dna, sample_dna, mutation_pos):
 
 # Main execution block
 reference_sequence, sample_sequence = load_and_check_fasta("tea_etalon.fasta", "tea_reducted.fasta")
-is_mutated = analyze_dna_sequences(reference_sequence, sample_sequence)
+aligned_ref, aligned_sample = align_sequences(reference_sequence, sample_sequence)
+is_mutated = analyze_dna_sequences(aligned_ref, aligned_sample)
