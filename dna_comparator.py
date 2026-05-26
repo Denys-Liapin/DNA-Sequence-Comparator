@@ -1,7 +1,17 @@
+import sys
+import re
 from Bio import SeqIO
 from Bio.Seq import Seq
-import re
 from Bio.Align import PairwiseAligner
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Error: Invalid number of arguments.")
+        print("Usage format:")
+        print("  python3 dna_comparator.py <reference_file.fasta> <sample_file.fasta>")
+        print("\nExample:")
+        print("  python3 dna_comparator.py tea_etalon.fasta tea_reducted.fasta")
+        sys.exit(1)
 
 def load_and_check_fasta(reference_file, sample_file):
     print("--- Running DNA Analyzer ---")
@@ -134,6 +144,6 @@ def check_codon_mutation(ref_dna, sample_dna, mutation_pos):
 
 
 # Main execution block
-reference_sequence, sample_sequence = load_and_check_fasta("tea_etalon.fasta", "tea_reducted.fasta")
+reference_sequence, sample_sequence = load_and_check_fasta(sys.argv[1], sys.argv[2])
 aligned_ref, aligned_sample = align_sequences(reference_sequence, sample_sequence)
 is_mutated = analyze_dna_sequences(aligned_ref, aligned_sample)
