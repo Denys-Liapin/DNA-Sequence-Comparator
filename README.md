@@ -6,7 +6,7 @@ A versatile Python command-line interface tool designed to compare DNA sequences
 ## Scientific Context
 This tool is built as a universal sequence comparator. Whether analyzing viral strains, bacterial adaptations, or genetic variations in plants and mammals, this script allows researchers to quickly spot structural differences and potential functional mutations without relying on resource-heavy, genome-wide aligners. It is designed to be sequence-agnostic, providing fast, localized visualization of SNPs in any provided FASTA sequence.
 
-## 🚀 Usage
+## Usage
 Run the script from your terminal by passing your reference and sample `.fasta` files directly:
 
 ```bash
