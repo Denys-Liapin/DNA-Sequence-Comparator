@@ -13,7 +13,7 @@ Run the script from your terminal by passing your reference and sample `.fasta` 
 git clone https://github.com/Denys-Liapin/DNA-Sequence-Comparator.git
 cd DNA-Sequence-Comparator
 python3 dna_comparator.py <reference_file.fasta> <sample_file.fasta>
-
+```
 
 ## Key Features
 - **FASTA Parsing:** Efficiently reads standard biological sequence files using `Biopython`.
