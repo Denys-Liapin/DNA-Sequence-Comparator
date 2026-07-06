@@ -23,3 +23,14 @@ python3 dna_comparator.py <reference_file.fasta> <sample_file.fasta>
 ## Tech Stack
 - Python 3
 - Biopython
+
+<details>
+<summary>
+
+work example
+
+</summary>
+
+<img width="977" height="483" alt="image" src="https://github.com/user-attachments/assets/b4c6e664-47de-4646-b7de-42444bf72345" />
+
+</details>
